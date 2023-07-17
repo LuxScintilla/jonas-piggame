@@ -23,7 +23,38 @@ let currentScore2 = 0;
 let totalScore1 = 0;
 let totalScore2 = 0;
 
-newGame.addEventListener("click", function () {
+newGame.addEventListener("click", clearGame);
+
+rollDice.addEventListener("click", function () {
+  randomNumber = Math.trunc(Math.random() * 6 + 1);
+  createDice(randomNumber);
+
+  addDiceRoll();
+});
+
+holdButton.addEventListener("click", function () {
+  if (sectionPlayerOne.classList.contains("active")) {
+    totalScore1 += currentScore1;
+    player1TotalScore.textContent = totalScore1;
+    currentScore1 = 0;
+    currentScoreP1.textContent = currentScore1;
+    changePlayer();
+  } else if (sectionPlayerTwo.classList.contains("active")) {
+    totalScore2 += currentScore2;
+    player2TotalScore.textContent = totalScore2;
+    currentScore2 = 0;
+    currentScoreP2.textContent = currentScore2;
+    changePlayer();
+  }
+  if (totalScore1 >= 20 || totalScore2 >= 20) {
+    openModal();
+  }
+});
+
+function clearGame() {
+  rollDice.disabled = false;
+  holdButton.disabled = false;
+
   sectionPlayerOne.style.backgroundColor = "#ffffff";
   sectionPlayerTwo.style.backgroundColor = "#ffffff";
 
@@ -42,34 +73,7 @@ newGame.addEventListener("click", function () {
 
   clearDots();
   diceContainer.style.visibility = "hidden";
-});
-
-rollDice.addEventListener("click", function () {
-  randomNumber = Math.trunc(Math.random() * 6 + 1);
-  createDice(randomNumber);
-
-  addDiceRoll();
-});
-
-holdButton.addEventListener("click", function () {
-  if (totalScore1 >= 20 || totalScore2 >= 20) {
-    openModal();
-  }
-
-  if (sectionPlayerOne.classList.contains("active")) {
-    totalScore1 += currentScore1;
-    player1TotalScore.textContent = totalScore1;
-    currentScore1 = 0;
-    currentScoreP1.textContent = currentScore1;
-    changePlayer();
-  } else if (sectionPlayerTwo.classList.contains("active")) {
-    totalScore2 += currentScore2;
-    player2TotalScore.textContent = totalScore2;
-    currentScore2 = 0;
-    currentScoreP2.textContent = currentScore2;
-    changePlayer();
-  }
-});
+}
 
 function addDiceRoll() {
   if (sectionPlayerOne.classList.contains("active")) {
@@ -159,16 +163,34 @@ function clearDots() {
 const modal = document.querySelector(".modal");
 const overlay = document.querySelector(".overlay");
 const closeButton = document.querySelector(".close-modal");
+const playAgainButton = document.querySelector(".play-again");
+
+const modalTitle = document.querySelector(".modal-title");
+const modalText = document.querySelector(".modal-text");
 
 function openModal() {
   modal.classList.remove("hidden");
   overlay.classList.remove("hidden");
+  if (totalScore1 > totalScore2) {
+    modalTitle.textContent = "The winner is Player 1";
+    modalText.textContent = `Player 1 has won with ${totalScore1} points! Better luck next time Player 2, you only scored ${totalScore2}`;
+  } else {
+    modalTitle.textContent = "The winner is Player 2";
+    modalText.textContent = `Player 2 has won with ${totalScore2} points! Better luck next time Player 1, you only scored ${totalScore1}`;
+  }
 }
 
 function closeModal() {
   modal.classList.add("hidden");
   overlay.classList.add("hidden");
+  rollDice.disabled = true;
+  holdButton.disabled = true;
 }
+
+playAgainButton.addEventListener("click", function () {
+  clearGame();
+  closeModal();
+});
 
 closeButton.addEventListener("click", closeModal);
 
